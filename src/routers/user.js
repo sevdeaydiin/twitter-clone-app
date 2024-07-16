@@ -94,10 +94,28 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
     req.user.avatarExists = true
     await req.user.save() 
 
-    res.send()
+    res.send(buffer)
+
 }, (error, req, res, next) => {
     res.status(400).send({ error: error })
 })
 
+router.get('/users/:id/avatar', async (req, res) => {
+    try {
+        
+        const user = await User.findById(req.params.id)
+
+        if(!user || !user.avatar) {
+            throw new Error('The user doesnt exists')
+        }
+    
+        res.set('Content-Type', 'image/jpg')
+        res.send(user.avatar)
+
+    } catch (e) {
+        res.status(404).send(e)
+    }
+    
+})
 
 module.exports = router
