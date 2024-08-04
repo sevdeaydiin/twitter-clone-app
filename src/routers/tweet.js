@@ -89,4 +89,18 @@ router.put('/tweets/:id/like', auth, async (req, res) => {
     }  
 })
 
+router.put('/tweets/:id/unlike', auth, async (req, res) => {
+    try {
+        const tweet = await Tweet.findById(req.params.id)
+        if(tweet.likes.includes(req.user.id)) {
+            await tweet.updateOne({ $pull: { likes: req.user.id }} )
+            res.status(200).send("post has been unliked")
+        } else {
+             res.status(403).send("you have already unliked this tweet")
+        }
+    } catch(err) {
+        res.status(500).json(err)
+    }
+})
+
 module.exports = router
